@@ -68,6 +68,22 @@ class Authentication extends Component {
       });
   }
 
+  google(event){
+    console.log("I am in google method");
+    var provider = new firebase.auth.GoogleAuthProvider();
+    const promise = firebase.auth().signInWithPopup(provider);
+
+    promise.then(resp=>{
+      var user = resp.user;
+      console.log(resp);
+      firebase.database().ref('users/'+user.uid).set({email:user.email, name:user.displayName});
+      this.setState({message:"Account created for "+user.email});
+    }).catch(e=>{
+      var message = e.message;
+      this.setState({message:message});
+    });
+  }
+
   constructor(props){
     super(props);
 
@@ -77,6 +93,7 @@ class Authentication extends Component {
     this.login = this.login.bind(this);
     this.signUp = this.signUp.bind(this);
     this.logout = this.logout.bind(this);
+    this.google = this.google.bind(this);
   }
   render(){
     return(
@@ -86,7 +103,8 @@ class Authentication extends Component {
         <p>{this.state.message}</p>
         <button onClick={this.login}> Log In</button>
         <button onClick={this.signUp}> Sign Up</button>
-        <button id="logout" className="hide" onClick={this.logout}> Log Out</button>
+        <button id="logout" className="hide" onClick={this.logout}> Log Out</button><br/>
+        <button id="google" className="google" onClick={this.google}>Sign In with Google</button>
       </div>
     );
   }
